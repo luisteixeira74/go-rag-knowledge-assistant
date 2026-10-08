@@ -1,0 +1,30 @@
+# Environment & Secrets
+.env
+*.env
+!.env.example
+
+# Binaries & Executables
+/bin/
+*.exe
+*.exe;
+*.dll
+*.so
+*.dylib
+query
+ingest
+
+# IDEs & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Go Test & Coverage
+*.out
+*.test
+coverage.txt
+
+# Log Files
+*.log
