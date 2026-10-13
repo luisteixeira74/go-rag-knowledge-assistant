@@ -13,6 +13,7 @@ type DocumentChunk struct {
 	Content    string    `json:"content"`
 	TokenCount int       `json:"token_count"`
 	Embedding  []float32 `json:"embedding,omitempty"`
+	EmbeddingModel string    `json:"embedding_model"`
 	Score      float64   `json:"score,omitempty"` // Relevância / Similaridade em buscas
 	CreatedAt  time.Time `json:"created_at"`
 

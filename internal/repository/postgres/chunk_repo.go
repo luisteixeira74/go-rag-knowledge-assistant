@@ -26,8 +26,16 @@ func (r *ChunkRepository) SaveBatch(ctx context.Context, chunks []domain.Documen
 
 	batch := &pgx.Batch{}
 	query := `
-		INSERT INTO document_chunks (id, document_id, chunk_index, content, token_count, embedding, created_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7)
+		INSERT INTO document_chunks (
+			id, document_id, chunk_index, content, token_count, 
+			embedding, embedding_model, created_at
+		)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		ON CONFLICT (document_id, chunk_index) DO UPDATE SET
+			content = EXCLUDED.content,
+			token_count = EXCLUDED.token_count,
+			embedding = EXCLUDED.embedding,
+			embedding_model = EXCLUDED.embedding_model;
 	`
 
 	for _, chunk := range chunks {
@@ -39,6 +47,7 @@ func (r *ChunkRepository) SaveBatch(ctx context.Context, chunks []domain.Documen
 			chunk.Content,
 			chunk.TokenCount,
 			vec,
+			chunk.EmbeddingModel,
 			chunk.CreatedAt,
 		)
 	}
@@ -133,4 +142,10 @@ func (r *ChunkRepository) GetByDocumentID(ctx context.Context, documentID string
 	}
 
 	return chunks, nil
+}
+
+// Método utilitário para limpar chunks em caso de reindexação total
+func (r *ChunkRepository) DeleteAll(ctx context.Context) error {
+	_, err := r.db.Exec(ctx, "TRUNCATE TABLE document_chunks CASCADE; TRUNCATE TABLE documents CASCADE;")
+	return err
 }
